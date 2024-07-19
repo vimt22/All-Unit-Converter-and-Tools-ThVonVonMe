@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Unit Converter and Tools</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #result {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+        }
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .item {
+            flex: 1 0 calc(33.333% - 15px);
+            min-width: 100px;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        .item:hover {
+            background-color: #e0e0e0;
+        }
+        .item i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        #conversionArea {
+            display: none;
+            text-align: center;
+        }
+        input, select, button {
+            margin: 10px 5px;
+            padding: 5px;
+        }
+        @media (max-width: 600px) {
+            .item {
+                flex: 1 0 calc(50% - 15px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>All Unit Converter and Tools</h1>
+        <div id="conversionArea">
+            <h2 id="conversionTitle"></h2>
+            <input type="number" id="inputValue" placeholder="Enter value">
+            <select id="fromUnit"></select>
+            <select id="toUnit"></select>
+            <button onclick="convert()">Convert</button>
+        </div>
+        <p id="result"></p>
+        
+        <div class="grid">
+            <div class="item" onclick="showConversion('length')" style="color: #4a90e2;">
+                <i class="fas fa-ruler"></i>
+                <span>Length</span>
+            </div>
+            <div class="item" onclick="showConversion('area')" style="color: #50c878;">
+                <i class="fas fa-vector-square"></i>
+                <span>Area</span>
+            </div>
+            <div class="item" onclick="showConversion('mass')" style="color: #f44336;">
+                <i class="fas fa-weight"></i>
+                <span>Mass</span>
+            </div>
+            <div class="item" onclick="showConversion('temperature')" style="color: #ff9800;">
+                <i class="fas fa-thermometer-half"></i>
+                <span>Temperature</span>
+            </div>
+            <div class="item" onclick="showConversion('speed')" style="color: #9c27b0;">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Speed</span>
+            </div>
+            <div class="item" onclick="showConversion('volume')" style="color: #03a9f4;">
+                <i class="fas fa-flask"></i>
+                <span>Volume</span>
+            </div>
+            <div class="item" onclick="showConversion('currency')" style="color: #4caf50;">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Currency</span>
+            </div>
+            <div class="item" onclick="showConversion('cooking')" style="color: #795548;">
+                <i class="fas fa-utensils"></i>
+                <span>Cooking</span>
+            </div>
+            <div class="item" onclick="showConversion('time')" style="color: #607d8b;">
+                <i class="far fa-clock"></i>
+                <span>Time</span>
+            </div>
+            <div class="item" onclick="showConversion('fuel')" style="color: #ff5722;">
+                <i class="fas fa-gas-pump"></i>
+                <span>Fuel</span>
+            </div>
+            <div class="item" onclick="showConversion('storage')" style="color: #3f51b5;">
+                <i class="fas fa-database"></i>
+                <span>Storage</span>
+            </div>
+            <div class="item" onclick="showConversion('acceleration')" style="color: #e91e63;">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Acceleration</span>
+            </div>
+            <div class="item" onclick="showConversion('angle')" style="color: #9c27b0;">
+                <i class="fas fa-angle-double-right"></i>
+                <span>Angle</span>
+            </div>
+            <div class="item" onclick="showConversion('energy')" style="color: #3f51b5;">
+                <i class="fas fa-bolt"></i>
+                <span>Energy</span>
+            </div>
+            <div class="item" onclick="showConversion('frequency')" style="color: #2196f3;">
+                <i class="fas fa-signal"></i>
+                <span>Frequency</span>
+            </div>
+            <div class="item" onclick="showConversion('power')" style="color: #ff5722;">
+                <i class="fas fa-bolt"></i>
+                <span>Power</span>
+            </div>
+            <div class="item" onclick="showConversion('pressure')" style="color: #00bcd4;">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Pressure</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const conversions = {
+            length: {
+                units: ['Meters', 'Kilometers', 'Miles', 'Feet'],
+                convert: (value, from, to) => {
+                    const rates = {Meters: 1, Kilometers: 0.001, Miles: 0.000621371, Feet: 3.28084};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            area: {
+                units: ['Square Meters', 'Square Kilometers', 'Square Miles', 'Acres'],
+                convert: (value, from, to) => {
+                    const rates = {'Square Meters': 1, 'Square Kilometers': 1e-6, 'Square Miles': 3.861e-7, 'Acres': 0.000247105};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            mass: {
+                units: ['Grams', 'Kilograms', 'Pounds', 'Ounces'],
+                convert: (value, from, to) => {
+                    const rates = {Grams: 1, Kilograms: 0.001, Pounds: 0.00220462, Ounces: 0.035274};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            temperature: {
+                units: ['Celsius', 'Fahrenheit', 'Kelvin'],
+                convert: (value, from, to) => {
+                    if (from === 'Celsius' && to === 'Fahrenheit') return value * 9/5 + 32;
+                    if (from === 'Fahrenheit' && to === 'Celsius') return (value - 32) * 5/9;
+                    if (from === 'Celsius' && to === 'Kelvin') return value + 273.15;
+                    if (from === 'Kelvin' && to === 'Celsius') return value - 273.15;
+                    if (from === 'Fahrenheit' && to === 'Kelvin') return (value - 32) * 5/9 + 273.15;
+                    if (from === 'Kelvin' && to === 'Fahrenheit') return (value - 273.15) * 9/5 + 32;
+                    return value;
+                }
+            },
+            speed: {
+                units: ['Meters per Second', 'Kilometers per Hour', 'Miles per Hour'],
+                convert: (value, from, to) => {
+                    const rates = {'Meters per Second': 1, 'Kilometers per Hour': 3.6, 'Miles per Hour': 2.23694};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            volume: {
+                units: ['Liters', 'Milliliters', 'Cubic Meters', 'Gallons (US)'],
+                convert: (value, from, to) => {
+                    const rates = {Liters: 1, Milliliters: 1000, 'Cubic Meters': 0.001, 'Gallons (US)': 0.264172};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            currency: {
+                units: ['USD', 'EUR', 'GBP', 'JPY'],
+                convert: (value, from, to) => {
+                    const rates = {USD: 1, EUR: 0.84, GBP: 0.72, JPY: 109.65};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            cooking: {
+                units: ['Cups', 'Tablespoons', 'Teaspoons', 'Fluid Ounces (US)'],
+                convert: (value, from, to) => {
+                    const rates = {Cups: 1, Tablespoons: 16, Teaspoons: 48, 'Fluid Ounces (US)': 8};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            time: {
+                units: ['Seconds', 'Minutes', 'Hours', 'Days'],
+                convert: (value, from, to) => {
+                    const rates = {Seconds: 1, Minutes: 1/60, Hours: 1/3600, Days: 1/86400};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            fuel: {
+                units: ['Miles per Gallon', 'Kilometers per Liter', 'Liters per 100 Kilometers'],
+                convert: (value, from, to) => {
+                    if (from === 'Miles per Gallon' && to === 'Kilometers per Liter') return value * 0.425144;
+                    if (from === 'Kilometers per Liter' && to === 'Miles per Gallon') return value / 0.425144;
+                    if (from === 'Miles per Gallon' && to === 'Liters per 100 Kilometers') return 235.215 / value;
+                    if (from === 'Liters per 100 Kilometers' && to === 'Miles per Gallon') return 235.215 / value;
+                    if (from === 'Kilometers per Liter' && to === 'Liters per 100 Kilometers') return 100 / value;
+                    if (from === 'Liters per 100 Kilometers' && to === 'Kilometers per Liter') return 100 / value;
+                    return value;
+                }
+            },
+            storage: {
+                units: ['Bytes', 'Kilobytes', 'Megabytes', 'Gigabytes', 'Terabytes'],
+                convert: (value, from, to) => {
+                    const rates = {Bytes: 1, Kilobytes: 1/1024, Megabytes: 1/1048576, Gigabytes: 1/1073741824, Terabytes: 1/1099511627776};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            acceleration: {
+                units: ['Meter/second²', 'Gravity', 'Feet/second²'],
+                convert: (value, from, to) => {
+                    const g = 9.80665; // acceleration due to gravity in m/s²
+                    const rates = {'Meter/second²': 1, Gravity: 1 / g, 'Feet/second²': 3.28084};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            angle: {
+                units: ['Radians', 'Degrees', 'Minutes', 'Seconds'],
+                convert: (value, from, to) => {
+                    const radToDeg = 180 / Math.PI;
+                    const degToMin = 60;
+                    const minToSec = 60;
+                    if (from === 'Radians' && to === 'Degrees') return value * radToDeg;
+                    if (from === 'Degrees' && to === 'Radians') return value / radToDeg;
+                    if (from === 'Degrees' && to === 'Minutes') return value * degToMin;
+                    if (from === 'Minutes' && to === 'Degrees') return value / degToMin;
+                    if (from === 'Minutes' && to === 'Seconds') return value * minToSec;
+                    if (from === 'Seconds' && to === 'Minutes') return value / minToSec;
+                    if (from === 'Degrees' && to === 'Seconds') return value * degToMin * minToSec;
+                    if (from === 'Seconds' && to === 'Degrees') return value / (degToMin * minToSec);
+                    return value;
+                }
+            },
+            energy: {
+                units: ['Kilocalorie', 'Joule', 'Kilowatt Hour', 'BTU'],
+                convert: (value, from, to) => {
+                    const rates = {Kilocalorie: 4184, Joule: 1, 'Kilowatt Hour': 3.6e6, BTU: 1055.06};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            frequency: {
+                units: ['Hertz', 'Kilohertz', 'Megahertz'],
+                convert: (value, from, to) => {
+                    const rates = {Hertz: 1, Kilohertz: 1e-3, Megahertz: 1e-6};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            power: {
+                units: ['Watt', 'Kilowatt', 'Horsepower'],
+                convert: (value, from, to) => {
+                    const rates = {Watt: 1, Kilowatt: 1e-3, Horsepower: 0.00134102};
+                    return value * rates[to] / rates[from];
+                }
+            },
+            pressure: {
+                units: ['Pascal', 'Bar', 'PSI', 'Atm'],
+                convert: (value, from, to) => {
+                    const rates = {Pascal: 1, Bar: 1e-5, PSI: 0.000145038, Atm: 9.8692e-6};
+                    return value * rates[to] / rates[from];
+                }
+            }
+        };
+
+        function showConversion(type) {
+            const conversionArea = document.getElementById('conversionArea');
+            const conversionTitle = document.getElementById('conversionTitle');
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            const resultElement = document.getElementById('result');
+
+            conversionArea.style.display = 'block';
+            conversionTitle.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' Conversion';
+
+            fromUnit.innerHTML = '';
+            toUnit.innerHTML = '';
+            resultElement.textContent = '';
+
+            if (conversions[type]) {
+                conversions[type].units.forEach(unit => {
+                    fromUnit.add(new Option(unit, unit));
+                    toUnit.add(new Option(unit, unit));
+                });
+            }
+        }
+
+        function convert() {
+            const inputValue = parseFloat(document.getElementById('inputValue').value);
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            const resultElement = document.getElementById('result');
+
+            const conversionType = document.getElementById('conversionTitle').textContent.split(' ')[0].toLowerCase();
+
+            if (conversions[conversionType]) {
+                const result = conversions[conversionType].convert(inputValue, fromUnit, toUnit);
+                resultElement.textContent = `${inputValue} ${fromUnit} = ${result.toFixed(4)} ${toUnit}`;
+            } else {
+                resultElement.textContent = 'Conversion not implemented yet.';
+            }
+        }
+    </script>
+</body>
+</html>
